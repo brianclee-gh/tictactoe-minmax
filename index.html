@@ -13,12 +13,21 @@
 </head>
 
 <body>
-  <div id="header">TIC-TAC-TOE</div>
-  <div id="main">
-    <div id="scoreboard"> Player: 0 | Computer: 0</div>
-    <div id="gameboard"></div>
+  <div id="content">
+
+    <div id="header">TIC-TAC-TOE</div>
+    <div id="main">
+      <div id="gameSelect">
+        <button class="selectBtn" id="single">vs. Computer</button>
+        <button class="selectBtn" id="multiplayer">2 Players</button>
+      </div>
+      <div id="scoreboard"></div>
+      <div id="gameboard" class="hidden"></div>
+      <div id="result"></div>
+      <button id="newGameBtn" class="hidden">New Game</button>
+    </div>
   </div>
-  <button id="newGameBtn" class="hidden">New Game</button>
+
   <script src="./index.js"></script>
 </body>
 </html>
