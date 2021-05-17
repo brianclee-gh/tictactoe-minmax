@@ -1,8 +1,8 @@
 // Helpers
 
 var scores = {
-  X: 10,
-  O: -10,
+  X: -10,
+  O: 10,
   tie: 0
 }
 
@@ -11,7 +11,7 @@ var scores = {
 var updateScore = function(winner) {
   var scoreboard = document.getElementById('scoreboard');
   scoreboard.innerHTML = game.gameMode === 'single' ?
-    `Player: ${game.score.X} | Computer: ${game.score.computer}`
+    `Player: ${game.score.X} | Computer: ${game.score.O}`
     : `Player 1: ${game.score.X} | Player 2: ${game.score.O}`;
 
   var result = document.getElementById('result');
@@ -26,9 +26,8 @@ function equals3(a, b, c) {
   return a == b && b == c && a != '';
 }
 
-function checkWinner() {
+function checkWinner(board=game.board) {
   var winner = null;
-  var board = game.board;
 
   // horizontal
   for (var i = 0; i < 3; i++) {
@@ -91,7 +90,6 @@ var resetBoards = function() {
 
 var selectGameMode = function(mode) {
   game.gameMode = mode;
-  console.log(game.gameMode)
   document.getElementById('gameSelect').classList.add('hidden');
   document.getElementById('gameboard').classList.remove('hidden');
   return;
@@ -109,6 +107,8 @@ var handleNewGame = function() {
 };
 
 var handleEndGame = function(winner) {
+  if (winner === null) { return; }
+
   game.score[winner] += 1;
   updateScore(winner);
   toggleNewBtn();
@@ -134,25 +134,6 @@ var isValidMove = function(targetID) {
   }
   return false;
 
-  // if (game.board[x][y] === '') {
-  //   targetNode.innerHTML = 'X';
-  //   game.board[x][y] = 'X';
-  //   if (checkWinner() === 'X') {
-  //     game.score.player += 1;
-  //     updateScore();
-  //     toggleNewBtn();
-  //     game.gameActive = false;
-  //     return;
-  //   } else if (checkWinner() === 'tie') {
-  //     console.log('tie');
-  //     game.gameActive = false;
-  //     toggleNewBtn();
-  //   }
-  //   return true;
-  // }
-
-  // return false;
-
 };
 
 var handleBoardClick = function(e) {
@@ -161,8 +142,8 @@ var handleBoardClick = function(e) {
   if (!isValidMove(e.target.id)) { return; }
 
   if (game.gameMode === 'single') {
-    // computerRandomMove();
-    bestMove();
+    computerRandomMove();
+    // findBestMove();
   } else {
     game.currentPlayer = game.currentPlayer === 'X' ? 'O' : 'X';
   }
@@ -170,69 +151,6 @@ var handleBoardClick = function(e) {
 };
 
 // Handle Computer (Minimax)
-
-var bestMove = function() {
-  // AI to make its turn
-  var bestScore = -Infinity;
-  var move;
-  var board = game.board;
-
-  for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
-      // Is the spot available?
-      if (board[i][j] == '') {
-        board[i][j] = 'O';
-        var score = minMax(board, 0, false);
-        board[i][j] = '';
-        if (score > bestScore) {
-          bestScore = score;
-          move = { i, j };
-        }
-      }
-    }
-  }
-  board[move.i][move.j] = 'O';
-  var boardNode = `node_${(move.i * 3) + move.j}`;
-  document.getElementById(boardNode).innerHTML = 'O';
-
-};
-
-var minMax = function(board, depth, isMaximizing) {
-  var result = checkWinner();
-  if (result !== null) {
-    return scores[result];
-  }
-
-  if (isMaximizing) {
-    var bestScore = -Infinity;
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
-        // Is the spot available?
-        if (board[i][j] == '') {
-          board[i][j] = 'O';
-          var score = minMax(board, depth + 1, false);
-          board[i][j] = '';
-          bestScore = Math.max(score, bestScore);
-        }
-      }
-    }
-    return bestScore;
-  } else {
-    var bestScore = Infinity;
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
-        // Is the spot available?
-        if (board[i][j] == '') {
-          board[i][j] = 'X';
-          var score = minMax(board, depth + 1, true);
-          board[i][j] = '';
-          bestScore = Math.min(score, bestScore);
-        }
-      }
-    }
-    return bestScore;
-  }
-};
 
 // Handle Computer (Random)
 
