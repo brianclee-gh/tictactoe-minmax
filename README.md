@@ -1,21 +1,20 @@
 # tictactoe-minmax
 ========
+$Tic Tac Toe
 
 Features
 --------
 
-- Play against a friend, a randomized computer, or an optimized computer player that can't lose!
-- Make things faster
+- A Tic Tac Toe game built in JavaScript
+- Play against your friend, a randomized computer player, or an optimized computer player that can't lose!
 
-
-- Source Code: github.com/$project/$project
 
 Things Learned
 -------
 
 - Minimax Algorithm
-- 
+- Tracking score and game status with JS Classes
 
-License
+
+To Add
 -------
-
