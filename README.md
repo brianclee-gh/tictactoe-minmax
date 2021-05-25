@@ -1,20 +1,20 @@
 # tictactoe-minmax
-$Tic_Tac_Toe
 ========
 
 Features
 --------
 
-- Be awesome
+- Play against a friend, a randomized computer, or an optimized computer player that can't lose!
 - Make things faster
 
-ues
+
 - Source Code: github.com/$project/$project
 
-Support
+Things Learned
 -------
 
-If you are having issues, please let us know.
+- Minimax Algorithm
+- 
 
 License
 -------
