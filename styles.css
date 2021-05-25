@@ -57,6 +57,7 @@ html, body {
 	background-color: #009688;
 	color: white;
 	width: 100%;
+	font-family: 'Ubuntu', sans-serif;
 }
 
 #content {
@@ -69,6 +70,7 @@ html, body {
 	font-size: 35px;
 	padding: 2rem;
 	text-align: center;
+	font-family: 'Ubuntu', sans-serif;
 }
 
 /* Scoreboard */
@@ -76,7 +78,7 @@ html, body {
 #scoreboard {
 	display: flex;
 	justify-content: center;
-	margin-bottom: 7rem;
+	margin-bottom: 4rem;
 }
 /* Gameboard */
 
@@ -119,8 +121,29 @@ html, body {
 	display: none;
 }
 
+#result {
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+}
+
 /* Button */
 
 button {
 	margin-top: 5rem;
+}
+
+.selectBtn, #newGameBtn {
+	background-color: #009688;
+	border: 2px solid white;
+	color: white;
+	padding: 1.0rem;
+	cursor: pointer;
+	font-family: 'Raleway', sans-serif;
+	margin: 0.2rem;
+	font-size: 15px;
+}
+
+.selectBtn:hover,
+#newGameBtn:hover {
+	opacity: 0.8;
 }

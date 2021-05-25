@@ -1,43 +1,56 @@
 // Helpers
 
-var scores = {
+const scores = {
   X: -10,
   O: 10,
   tie: 0
-}
+};
+
+const equals3 = (a, b, c) => {
+  return a == b && b == c && a != '';
+};
 
 // Handle turns
 
-var updateScore = function(winner) {
-  var scoreboard = document.getElementById('scoreboard');
-  scoreboard.innerHTML = game.gameMode === 'single' ?
-    `Player: ${game.score.X} | Computer: ${game.score.O}`
-    : `Player 1: ${game.score.X} | Player 2: ${game.score.O}`;
+const updateScore = (winner) => {
+  const scoreboard = document.getElementById('scoreboard');
+  scoreboard.innerHTML = scoreboardText();
 
-  var result = document.getElementById('result');
-  if (winner === 'tie') {
-    result.innerHTML = 'Tie...'
-  } else {
-    result.innerHTML = `${winner} wins!`
-  }
+  const result = document.getElementById('result');
+  result.innerHTML = resultText(winner);
 };
 
-function equals3(a, b, c) {
-  return a == b && b == c && a != '';
-}
+const scoreboardText = () => {
+  if (game.gameMode === 'single') return `Player: ${game.score.X}
+    | Computer: ${game.score.computer}`;
 
-function checkWinner(board=game.board) {
-  var winner = null;
+  return `Player X: ${game.score.X} | Player O: ${game.score.O}`;
+};
+
+const resultText = (winner) => {
+  const text = '';
+
+  if (winner === 'tie') return 'Tie...';
+
+  if (game.gameMode === 'single') return winner === 'X' ?
+    'Player wins!' : 'Computer wins...'
+
+  return `${winner} wins!`;
+
+};
+
+const checkWinner = (board=game.board) => {
+  let winner = null;
 
   // horizontal
-  for (var i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     if (equals3(board[i][0], board[i][1], board[i][2])) {
       winner = board[i][0];
     }
   }
 
   // Vertical
-  for (var i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     if (equals3(board[0][i], board[1][i], board[2][i])) {
       winner = board[0][i];
     }
@@ -51,9 +64,9 @@ function checkWinner(board=game.board) {
     winner = board[2][0];
   }
 
-  var openSpots = 0;
-  for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
+  let openSpots = 0;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
       if (board[i][j] == '') {
         openSpots++;
       }
@@ -69,9 +82,9 @@ function checkWinner(board=game.board) {
 
 // Handle new game
 
-var resetBoards = function() {
-  var gamegrid = document.getElementById('gamegrid');
-  var children = [...gamegrid.childNodes];
+const resetBoards = () => {
+  const gamegrid = document.getElementById('gamegrid');
+  let children = [...gamegrid.childNodes];
 
   children.forEach(function(node) {
     node.innerHTML = '';
@@ -83,31 +96,33 @@ var resetBoards = function() {
     ['','','']
   ];
 
-  var result = document.getElementById('result');
+  const result = document.getElementById('result');
   result.innerHTML = '';
 
 };
 
-var selectGameMode = function(mode) {
+const selectGameMode = (mode) => {
   game.gameMode = mode;
   document.getElementById('gameSelect').classList.add('hidden');
   document.getElementById('gameboard').classList.remove('hidden');
   return;
 };
 
-var toggleNewBtn = function() {
-  var btn = document.getElementById('newGameBtn');
+const toggleNewBtn = () => {
+  const btn = document.getElementById('newGameBtn');
   btn.classList.toggle('hidden');
 };
 
-var handleNewGame = function() {
+const handleNewGame = () => {
   resetBoards();
   toggleNewBtn();
   game.gameActive = true;
+  game.currentPlayer = 'X';
 };
 
-var handleEndGame = function(winner) {
+const handleEndGame = (winner) => {
   if (winner === null) { return; }
+  if (game.gameMode === 'single' && winner === 'O') winner = 'computer';
 
   game.score[winner] += 1;
   updateScore(winner);
@@ -118,11 +133,11 @@ var handleEndGame = function(winner) {
 
 // Handle Player
 
-var isValidMove = function(targetID) {
+const isValidMove = (targetID) => {
 
-  var targetNode = document.getElementById(targetID);
-  var x = parseInt(targetNode.dataset.x);
-  var y = parseInt(targetNode.dataset.y);
+  const targetNode = document.getElementById(targetID);
+  let x = parseInt(targetNode.dataset.x);
+  let y = parseInt(targetNode.dataset.y);
 
   if (game.board[x][y] === '') {
     targetNode.innerHTML = game.currentPlayer;
@@ -136,14 +151,14 @@ var isValidMove = function(targetID) {
 
 };
 
-var handleBoardClick = function(e) {
+const handleBoardClick = (e) => {
   if (!game.gameActive) { return; }
   if (!e.target.classList.contains('node')) { return; }
   if (!isValidMove(e.target.id)) { return; }
 
   if (game.gameMode === 'single') {
-    computerRandomMove();
-    // findBestMove();
+    // computerRandomMove();
+    bestMove()
   } else {
     game.currentPlayer = game.currentPlayer === 'X' ? 'O' : 'X';
   }
@@ -152,20 +167,90 @@ var handleBoardClick = function(e) {
 
 // Handle Computer (Minimax)
 
+const bestMove = () => {
+  let bestScore = -Infinity;
+  let move;
+  const board = game.board;
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      // Is the spot available?
+      if (board[i][j] == '') {
+        board[i][j] = 'O';
+        let score = minimax(board, 0, false);
+        board[i][j] = '';
+        if (score > bestScore) {
+          bestScore = score;
+          move = [i, j];
+        }
+      }
+    }
+  }
+
+  handleComputerMove(move[0], move[1]);
+  handleEndGame(checkWinner());
+  game.currentPlayer = 'X';
+};
+
+const handleComputerMove = (x, y) => {
+  game.board[x][y] = 'O';
+  const id = ((x * 3 )+ y);
+  const targetID = `node_${id}`;
+  const targetNode = document.getElementById(targetID);
+  targetNode.innerHTML = 'O';
+};
+
+
+const minimax = (board, depth, isMaximizing) => {
+  let result = checkWinner();
+
+  if (result !== null) {
+    return scores[result] - depth;
+  }
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        // Is the spot available?
+        if (board[i][j] == '') {
+          board[i][j] = 'O';
+          let score = minimax(board, depth + 1, false);
+          board[i][j] = '';
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        // Is the spot available?
+        if (board[i][j] == '') {
+          board[i][j] = 'X';
+          let score = minimax(board, depth + 1, true);
+          board[i][j] = '';
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+    }
+    return bestScore;
+  }
+}
 // Handle Computer (Random)
 
-var randomNumber = function(min, max) {
+const randomNumber = (min, max) => {
   return Math.floor((Math.random() * (max - min + 1) - min));
 }
 
-var computerRandomMove = function() {
+const computerRandomMove = () => {
   if (!game.gameActive) { return; }
-  var targetID = `node_${randomNumber(0, 8)}`;
-  var nodeID = parseInt(targetID.slice(-1));
-  var targetNode = document.getElementById(targetID);
+  let targetID = `node_${randomNumber(0, 8)}`;
+  const targetNode = document.getElementById(targetID);
 
-  var x = parseInt(targetNode.dataset.x);
-  var y = parseInt(targetNode.dataset.y);
+  let x = parseInt(targetNode.dataset.x);
+  let y = parseInt(targetNode.dataset.y);
 
   if (targetNode.innerHTML === '') {
     targetNode.innerHTML = 'O';
@@ -184,7 +269,7 @@ var computerRandomMove = function() {
 
 // Initialize
 
-var Tictactoe = class {
+const Tictactoe = class {
   constructor() {
     this.gameActive = true;
     this.currentPlayer = 'X';
@@ -201,15 +286,29 @@ var Tictactoe = class {
       ['','','']
     ]
   }
+
+  getAvailableMoves = () => {
+    let moves = [];
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (this.board[i][j] === '') {
+          moves.push([i, j])
+        }
+      }
+    }
+
+    return moves;
+  }
 };
 
-var populateBoard = function() {
-  var gameboard = document.getElementById('gameboard');
-  var gamegrid = document.createElement('div');
+const populateBoard = () => {
+  const gameboard = document.getElementById('gameboard');
+  const gamegrid = document.createElement('div');
   gamegrid.id = 'gamegrid';
 
-  for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
       var node = document.createElement('div');
       node.id = `node_${(i * 3) + j}`;
       node.setAttribute('data-x', i);
@@ -224,22 +323,22 @@ var populateBoard = function() {
 
 };
 
-var addListeners = function() {
+const addListeners = () => {
 
   // grid
-  var gamegrid = document.getElementById('gamegrid');
+  const gamegrid = document.getElementById('gamegrid');
   gamegrid.addEventListener("click", function(e) {
     handleBoardClick(e);
   });
 
   // newGame
-  var newGameBtn = document.getElementById('newGameBtn');
+  const newGameBtn = document.getElementById('newGameBtn');
   newGameBtn.addEventListener("click", function() {
     handleNewGame();
   });
 
   // selectGame
-  var gameSelect = document.getElementById('gameSelect');
+  const gameSelect = document.getElementById('gameSelect');
   gameSelect.addEventListener("click", function(e) {
     if (e.target.classList.contains('selectBtn')) {
       selectGameMode(e.target.id);
@@ -250,4 +349,4 @@ var addListeners = function() {
 
 populateBoard();
 addListeners();
-var game = new Tictactoe();
+const game = new Tictactoe();
