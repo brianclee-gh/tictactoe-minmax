@@ -1,3 +1,5 @@
+//Add clarity to game mode
+
 // Helpers
 
 const scores = {
@@ -11,6 +13,16 @@ const equals3 = (a, b, c) => {
 };
 
 // Handle turns
+
+const initialScore = () => {
+  const scoreboard = document.getElementById('scoreboard');
+  scoreboard.innerHTML = scoreboardText();
+};
+
+const updateTurn = () => {
+  const result = document.getElementById('result');
+  result.innerHTML = `It's ${game.currentPlayer}'s Turn`
+};
 
 const updateScore = (winner) => {
   const scoreboard = document.getElementById('scoreboard');
@@ -102,9 +114,14 @@ const resetBoards = () => {
 };
 
 const selectGameMode = (mode) => {
+  const validModes = ['random', 'single', 'multiplayer'];
+  if (!validModes.includes(mode)) return;
   game.gameMode = mode;
   document.getElementById('gameSelect').classList.add('hidden');
   document.getElementById('gameboard').classList.remove('hidden');
+  initialScore();
+
+  if (game.gameMode === 'multiplayer') updateTurn();
   return;
 };
 
@@ -118,6 +135,7 @@ const handleNewGame = () => {
   toggleNewBtn();
   game.gameActive = true;
   game.currentPlayer = 'X';
+  if (game.gameMode === 'multiplayer') updateTurn();
 };
 
 const handleEndGame = (winner) => {
@@ -154,14 +172,18 @@ const isValidMove = (targetID) => {
 const handleBoardClick = (e) => {
   if (!game.gameActive) { return; }
   if (!e.target.classList.contains('node')) { return; }
-  if (!isValidMove(e.target.id)) { return; }
+  if (!isValidMove(e.target.id)) { return; } // checks user move, updates UI
 
   if (game.gameMode === 'single') {
     // computerRandomMove();
-    bestMove()
+    bestMove();
+  } else if (game.gameMode === 'random') {
+    computerRandomMove();
   } else {
     game.currentPlayer = game.currentPlayer === 'X' ? 'O' : 'X';
   }
+
+  if (game.gameActive && game.gameMode === 'multiplayer') updateTurn();
 
 };
 
@@ -238,6 +260,8 @@ const minimax = (board, depth, isMaximizing) => {
     return bestScore;
   }
 }
+
+
 // Handle Computer (Random)
 
 const randomNumber = (min, max) => {
@@ -347,6 +371,10 @@ const addListeners = () => {
 
 };
 
-populateBoard();
-addListeners();
+const initialize = () => {
+  populateBoard();
+  addListeners();
+}
+
+initialize();
 const game = new Tictactoe();
