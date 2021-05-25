@@ -19,3 +19,4 @@ Things Learned
 
 To Add
 -------
+- Update UI (e.g. border thickness)

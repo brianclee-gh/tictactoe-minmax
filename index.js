@@ -1,5 +1,3 @@
-//Add clarity to game mode
-
 // Helpers
 
 const scores = {
