@@ -2,6 +2,8 @@
 
 ========
 
+![Alt text](/example.png?raw=true "example screenshot")
+
 
 Features
 --------
