@@ -1,6 +1,8 @@
 # tictactoe-minmax
-========
 $Tic Tac Toe
+
+========
+
 
 Features
 --------
